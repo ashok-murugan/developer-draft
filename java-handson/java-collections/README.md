@@ -120,43 +120,168 @@ src/main/java/com/ashokmurugan/collections/
 
 ## Time Complexity Reference
 
+Understanding time complexity helps you choose the right collection for your needs. Here's a quick reference:
+
 | Operation | ArrayList | LinkedList | HashSet | TreeSet | HashMap | TreeMap |
-|-----------|-----------|------------|---------|---------|---------|---------|
-| Add       | O(1)*     | O(1)       | O(1)    | O(log n)| O(1)    | O(log n)|
-| Remove    | O(n)      | O(1)**     | O(1)    | O(log n)| O(1)    | O(log n)|
-| Get       | O(1)      | O(n)       | -       | -       | O(1)    | O(log n)|
-| Contains  | O(n)      | O(n)       | O(1)    | O(log n)| O(1)    | O(log n)|
-| Iterate   | O(n)      | O(n)       | O(n)    | O(n)    | O(n)    | O(n)    |
+|-----------|-----------|------------|---------|---------|---------|------------|
+| Add       | O(1)*     | O(1)       | O(1)    | O(log n)| O(1)    | O(log n)   |
+| Remove    | O(n)      | O(1)**     | O(1)    | O(log n)| O(1)    | O(log n)   |
+| Get       | O(1)      | O(n)       | -       | -       | O(1)    | O(log n)   |
+| Contains  | O(n)      | O(n)       | O(1)    | O(log n)| O(1)    | O(log n)   |
+| Iterate   | O(n)      | O(n)       | O(n)    | O(n)    | O(n)    | O(n)       |
 
-*Amortized time complexity  
-**When node reference is known
+*Amortized time complexity (occasional O(n) when resizing)  
+**When node reference is known (O(n) to find the node first)
 
-## Building and Running
+**💡 Pro Tip:** For most use cases, ArrayList and HashMap are your best friends. Use TreeSet/TreeMap when you need sorted data, and LinkedList when you need efficient insertions at both ends.
+
+---
+
+## 🚀 Quick Start Guide
+
+### Prerequisites
+- Java 17 or higher
+- Maven 3.6+
+
+### Building and Running
 
 ```bash
+# Clone or navigate to the project directory
+cd java-collections
+
 # Compile the project
 mvn clean compile
 
-# Run tests
-mvn test
-
-# Package
-mvn package
+# Run any example (replace with desired example)
+java -cp target/classes com.ashokmurugan.collections.list.ArrayListExample
 ```
 
-## Running Individual Examples
+### Running Individual Examples
 
 Each example class has a `main` method that can be run directly:
 
 ```bash
-# Run ArrayList example
+# List examples
 java -cp target/classes com.ashokmurugan.collections.list.ArrayListExample
+java -cp target/classes com.ashokmurugan.collections.list.LinkedListExample
+java -cp target/classes com.ashokmurugan.collections.list.VectorExample
 
-# Run HashSet example
+# Set examples
 java -cp target/classes com.ashokmurugan.collections.set.HashSetExample
+java -cp target/classes com.ashokmurugan.collections.set.LinkedHashSetExample
+java -cp target/classes com.ashokmurugan.collections.set.TreeSetExample
 
-# And so on...
+# Map examples
+java -cp target/classes com.ashokmurugan.collections.map.HashMapExample
+java -cp target/classes com.ashokmurugan.collections.map.TreeMapExample
+
+# Queue examples
+java -cp target/classes com.ashokmurugan.collections.queue.PriorityQueueExample
+
+# Concurrent examples
+java -cp target/classes com.ashokmurugan.collections.concurrent.ConcurrentHashMapExample
+java -cp target/classes com.ashokmurugan.collections.concurrent.CopyOnWriteArrayListExample
+java -cp target/classes com.ashokmurugan.collections.concurrent.BlockingQueueExample
 ```
 
-## Author
-Ashok Murugan
+---
+
+## ❓ Frequently Asked Questions (FAQ)
+
+### When should I use ArrayList vs LinkedList?
+
+**Use ArrayList** (95% of cases):
+- Need fast random access by index
+- Mostly adding elements at the end
+- Iterating through elements
+- Memory efficiency is important
+
+**Use LinkedList**:
+- Frequent insertions/deletions at the beginning
+- Implementing a Queue or Deque
+- Don't need random access
+
+### What's the difference between HashSet and TreeSet?
+
+**HashSet**:
+- ⚡ Faster: O(1) operations
+- 🎲 No order guarantee
+- ✅ Allows one null element
+
+**TreeSet**:
+- 📊 Sorted order: O(log n) operations
+- 🔍 Supports range queries
+- ❌ No null elements
+
+### Should I use HashMap or TreeMap?
+
+**HashMap** (default choice):
+- O(1) get/put operations
+- Best for general key-value storage
+- Allows one null key
+
+**TreeMap**:
+- Keys automatically sorted
+- Supports navigation (higher, lower, etc.)
+- Perfect for range queries
+
+### Are Java Collections thread-safe?
+
+Most collections are **NOT thread-safe** by default:
+- ArrayList, HashMap, HashSet → Not thread-safe
+- Vector, Hashtable → Thread-safe but legacy (slow)
+
+**Modern alternatives:**
+- `ConcurrentHashMap` - Thread-safe map
+- `CopyOnWriteArrayList` - Thread-safe list (read-heavy)
+- `Collections.synchronizedList()` - Wrapper for thread-safety
+
+### How do I choose the right collection?
+
+Follow this simple decision tree:
+1. **Need key-value pairs?** → Use HashMap (or TreeMap if sorted)
+2. **Need unique elements?** → Use HashSet (or TreeSet if sorted)
+3. **Need ordered elements?** → Use ArrayList (or LinkedList for queue operations)
+4. **Need priority-based processing?** → Use PriorityQueue
+5. **Need thread-safety?** → Use concurrent collections
+
+---
+
+## 📖 Additional Resources
+
+- **[Collections Hierarchy](COLLECTIONS_HIERARCHY.md)** - Complete hierarchy with interface details
+- **[Concurrent Collections Guide](CONCURRENT_COLLECTIONS.md)** - Thread-safe collections with diagrams
+- **[Examples Summary](EXAMPLES_SUMMARY.md)** - Quick reference for all examples
+- **[Project Index](PROJECT_INDEX.md)** - Complete project structure and learning path
+
+---
+
+## 🤝 Contributing
+
+Found a bug or want to add more examples? Contributions are welcome! This is an educational project designed to help developers master Java Collections.
+
+---
+
+## 📝 License
+
+This project is created for educational purposes. Feel free to use it for learning and teaching.
+
+---
+
+## 👨‍💻 Author
+
+**Ashok Murugan**
+
+Passionate about teaching Java and helping developers write better code.
+
+---
+
+## 🌟 Keywords
+
+Java Collections, ArrayList, HashMap, HashSet, LinkedList, TreeSet, TreeMap, PriorityQueue, Data Structures, Java Tutorial, Coding Interview, Algorithm, Time Complexity, Big O Notation, ConcurrentHashMap, Thread-Safe Collections, Java 17, Maven Project
+
+---
+
+**⭐ If you found this helpful, please star this repository!**
+
+**📚 Happy Learning! Master Java Collections and write better code!** 🚀
