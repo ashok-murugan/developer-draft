@@ -37,11 +37,12 @@ Map (Interface)
 ## Project Structure
 
 ```
-src/main/java/com/ashok/collections/
+src/main/java/com/ashokmurugan/collections/
 ├── list/           # List implementations (ArrayList, LinkedList, Vector, Stack)
 ├── set/            # Set implementations (HashSet, LinkedHashSet, TreeSet)
 ├── queue/          # Queue implementations (PriorityQueue, ArrayDeque)
 ├── map/            # Map implementations (HashMap, LinkedHashMap, TreeMap, Hashtable)
+├── concurrent/     # Concurrent collections (ConcurrentHashMap, CopyOnWriteArrayList, BlockingQueue)
 └── adt/            # Custom ADT implementations
 ```
 
@@ -68,6 +69,13 @@ src/main/java/com/ashok/collections/
 2. **LinkedHashMap** - Hash table + linked list map
 3. **TreeMap** - Red-Black tree based sorted map
 4. **Hashtable** - Legacy synchronized hash table
+
+### Concurrent Collections (java.util.concurrent)
+1. **ConcurrentHashMap** - Thread-safe hash map with fine-grained locking
+2. **CopyOnWriteArrayList** - Thread-safe list optimized for read-heavy scenarios
+3. **BlockingQueue** - Thread-safe queue with blocking operations (ArrayBlockingQueue, LinkedBlockingQueue, PriorityBlockingQueue)
+
+📖 **See [CONCURRENT_COLLECTIONS.md](CONCURRENT_COLLECTIONS.md) for detailed documentation with flow diagrams**
 
 ## Time Complexity Reference
 
