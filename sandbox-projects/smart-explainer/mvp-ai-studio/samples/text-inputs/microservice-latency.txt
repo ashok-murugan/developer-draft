@@ -1,0 +1,1 @@
+Our microservice calls to user-service intermittently timeout causing cascading retries and increased tail latency. CPU and memory appear normal.

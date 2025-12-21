@@ -1,0 +1,21 @@
+input_file,mode,score,notes,prompt_version
+java-nullpointer.txt,text,0,Not tested yet,v1
+java-nullpointer.txt,json,0,Not tested yet,v1
+port-in-use.txt,text,0,Not tested yet,v1
+port-in-use.txt,json,0,Not tested yet,v1
+microservice-latency.txt,text,0,Not tested yet,v1
+microservice-latency.txt,json,0,Not tested yet,v1
+stacktrace-screenshot.png,image,0,Not tested yet,v1
+terminal-error.png,image,0,Not tested yet,v1
+whiteboard-diagram.jpg,image,0,Not tested yet,v1
+
+# Scoring Guide:
+# 5 = Excellent - All sections accurate, actionable, and well-formatted
+# 4 = Good - Minor issues but overall very useful
+# 3 = Acceptable - Some inaccuracies or missing details
+# 2 = Poor - Significant issues or unhelpful output
+# 1 = Failed - Wrong or unusable output
+# 0 = Not tested
+
+# Target: Average score ≥ 4.0 across all samples
+# JSON parse rate target: ≥ 90%
