@@ -1,0 +1,5 @@
+Artificial Intelligence (AI) is intelligence demonstrated by machines, as opposed to the natural intelligence displayed by animals including humans. AI research has been defined as the field of study of intelligent agents, which refers to any system that perceives its environment and takes actions that maximize its chance of achieving its goals.
+
+The term "artificial intelligence" had previously been used to describe machines that mimic and display "human" cognitive skills that are associated with the human mind, such as "learning" and "problem-solving". This definition has since been rejected by major AI researchers who now describe AI in terms of rationality and acting rationally, which does not limit how intelligence can be articulated.
+
+Retrieval-Augmented Generation (RAG) is a technique used to "augment" the capabilities of a Large Language Model (LLM) with specific, external data. It works by retrieving relevant documents from a database and providing them to the LLM as context to answer a query. This helps reduce hallucinations and allows the model to access information it wasn't trained on.
