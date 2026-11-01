@@ -49,8 +49,8 @@ flowchart TD
 
 ```powershell
 # Windows
-git clone https://github.com/ashok-murugan/developer-draft.git "%USERPROFILE%\developer-draft"
-cd "%USERPROFILE%\developer-draft\task-offloader-agent"
+git clone https://github.com/ashok-murugan/developer-draft.git "$env:USERPROFILE\developer-draft"
+cd "$env:USERPROFILE\developer-draft\task-offloader-agent"
 ```
 
 ```bash
@@ -71,7 +71,9 @@ ollama pull qwen2.5-coder:7b
 
 ```powershell
 # Windows
-python -m venv .venv && .venv\Scripts\activate && pip install -e .
+python -m venv .venv
+.venv\Scripts\activate
+pip install -e .
 task-offloader --version
 ```
 

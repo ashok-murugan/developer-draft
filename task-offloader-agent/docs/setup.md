@@ -63,6 +63,17 @@ pip install -e .
 task-offloader --version
 ```
 
+> [!NOTE]
+> The venv activation (`activate`) only applies to the **current terminal session**.
+> To use `task-offloader` from any workspace without activating each time, add the venv bin to your user PATH once:
+> ```powershell
+> $binPath = "$env:USERPROFILE\developer-draft\task-offloader-agent\.venv\Scripts"
+> [Environment]::SetEnvironmentVariable("PATH", "$env:PATH;$binPath", "User")
+> $env:PATH += ";$binPath"   # also applies to the current session immediately
+> ```
+> After this, `task-offloader` works in every new terminal without activation.
+> Alternatively, use the `.task-offloader\task-offloader.ps1` wrapper that `init` creates in each workspace — it works without any PATH change.
+
 ```bash
 # bash — from the cloned directory
 python -m venv .venv

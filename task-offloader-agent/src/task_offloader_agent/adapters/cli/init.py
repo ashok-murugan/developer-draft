@@ -182,8 +182,11 @@ def run_init(
 
     if not dry_run:
         profile_path = workspace / ".task-offloader" / "profile.toml"
+        cmd_path     = workspace / ".task-offloader" / "task-offloader.cmd"
         print("Next steps:")
         print(f"  1. Review {profile_path.relative_to(workspace)} — add deny_paths for sensitive folders")
-        print("  2. Restart your AI client to pick up the new MCP server")
-        print(f"  3. task-offloader profile check")
+        print( "  2. Restart your AI client to pick up the new MCP server")
+        print( "  3. Validate — choose one:")
+        print(f"       Windows:  .task-offloader\\task-offloader.cmd profile check")
+        print( "       Any shell: task-offloader --workspace . --profile .task-offloader\\profile.toml profile check")
     return 0
