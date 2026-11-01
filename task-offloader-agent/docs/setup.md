@@ -11,7 +11,7 @@
 
 ---
 
-## Step 1 -- Pull a model
+## Step 1 — Pull a model
 
 ```bash
 ollama pull qwen2.5-coder:7b
@@ -22,7 +22,7 @@ For model comparisons and hardware requirements, see [Model Guide](models.md).
 
 ---
 
-## Step 2 -- Install the agent
+## Step 2 — Install the agent
 
 ```powershell
 # PowerShell
@@ -44,49 +44,76 @@ task-offloader --version
 
 ---
 
-## Step 3 -- Create workspace config
+## Step 3 — Initialise a workspace
 
-`.task-offloader/` lives inside **your workspace**, not this repo.
-
-```powershell
-# PowerShell
-mkdir <workspace>\.task-offloader
-copy assets\workspace\profile.toml <workspace>\.task-offloader\
-copy assets\workspace\task-offloader.ps1 <workspace>\.task-offloader\
-```
+`cd` into your project directory, then:
 
 ```bash
-# bash
-mkdir -p <workspace>/.task-offloader
-cp assets/workspace/profile.toml <workspace>/.task-offloader/
+task-offloader init
 ```
 
-Open `<workspace>/.task-offloader/profile.toml` and set at minimum:
+The interactive flow:
 
-```toml
-[inference]
-model   = "qwen2.5-coder:7b"
-num_ctx = 16384
+```
+Workspace:  /home/you/my-project  (name: 'my-project')
+Config dir: .task-offloader/  (fixed)
+Agent bin:  /home/you/task-offloader-agent/.venv/bin/task-offloader
+
+Ollama models: qwen2.5-coder:7b  llama3:8b
+Model [qwen2.5-coder:7b]:
+
+Which AI client(s) to wire?
+Enter numbers space-separated, or Enter to skip.
+
+  1  VS Code / GitHub Copilot        .vscode/mcp.json + .github/copilot-instructions.md (detected)
+  2  Claude Desktop                  CLAUDE.md
+  3  Cursor                          .cursor/mcp.json + .cursor/rules/task-offloader.mdc (detected)
+  4  Antigravity / Gemini            rules/task-offloader.md + skills/task-offloader/SKILL.md
+  5  All of the above
+Client(s) [1]:
+
+  created  .task-offloader/profile.toml
+  created  .task-offloader/task-offloader.ps1
+  created  .vscode/mcp.json
+  merged   .github/copilot-instructions.md
+  skipped  .cursor/mcp.json  (already exists — use --force to overwrite)
+
+Next steps:
+  1. Review .task-offloader/profile.toml — add deny_paths for sensitive folders
+  2. Restart your AI client to pick up the new MCP server
+  3. task-offloader profile check
 ```
 
-Full profile key reference: [Configuration Reference -- profile.toml](configuration.md#profiletoml--full-reference).
+**Flags:**
+
+| Flag | Purpose |
+|---|---|
+| `--model <tag>` | Skip the model prompt |
+| `--client <N...>` | Wire specific clients by number (`1`=Copilot `2`=Claude `3`=Cursor `4`=Antigravity `5`=All) |
+| `--force` | Overwrite existing client config files |
+| `--dry-run` | Preview all actions without writing |
+
+> [!NOTE]
+> `.task-offloader/` is created inside **your workspace**, not inside this repo.
+> Add `.task-offloader/run/` to your workspace `.gitignore`.
+
+For a second workspace, just `cd` there and run `task-offloader init` again. Each workspace gets its own `profile.toml`; the agent binary is shared.
 
 ---
 
-## Step 4 -- Validate profile
+## Step 4 — Validate profile
 
 ```bash
-task-offloader \
-  --workspace <workspace> \
-  --profile <workspace>/.task-offloader/profile.toml \
-  profile check
+task-offloader profile check
 ```
 
-Fix any reported errors before proceeding.
+Fix any reported errors before starting the MCP server.
 
 ---
 
-## Step 5 -- Wire to your AI client
+## Manual client wiring (reference)
+
+`init` handles wiring automatically. Use this section only if you need to re-wire manually or add a client that `init` did not detect.
 
 Replace `<venv>` with the absolute path to your `.venv` and `<workspace>` with the absolute path to your workspace.
 
@@ -94,21 +121,7 @@ Replace `<venv>` with the absolute path to your `.venv` and `<workspace>` with t
 
 ### VS Code / GitHub Copilot
 
-Copy the template:
-
-```powershell
-# PowerShell
-mkdir <workspace>\.vscode -ErrorAction SilentlyContinue
-copy assets\workspace\.vscode\mcp.json <workspace>\.vscode\mcp.json
-```
-
-```bash
-# bash
-mkdir -p <workspace>/.vscode
-cp assets/workspace/.vscode/mcp.json <workspace>/.vscode/mcp.json
-```
-
-Edit `<workspace>/.vscode/mcp.json`:
+`<workspace>/.vscode/mcp.json`:
 
 ```json
 {
@@ -126,9 +139,9 @@ Edit `<workspace>/.vscode/mcp.json`:
 }
 ```
 
-> **Windows:** use `<venv>\Scripts\task-offloader.exe` as the command value.
+> **Windows:** command value is `<venv>\Scripts\task-offloader.exe`.
 
-Reload VS Code. The MCP server appears under **GitHub Copilot > MCP Servers**.
+Reload VS Code. The server appears under **GitHub Copilot → MCP Servers**.
 
 ---
 
@@ -142,8 +155,6 @@ Config file locations:
 | macOS | `~/Library/Application Support/Claude/claude_desktop_config.json` |
 | Linux | `~/.config/claude/claude_desktop_config.json` |
 
-Add to `claude_desktop_config.json`:
-
 ```json
 {
   "mcpServers": {
@@ -160,41 +171,13 @@ Add to `claude_desktop_config.json`:
 }
 ```
 
-Copy the delegation rules template:
-
-```powershell
-# PowerShell
-copy assets\workspace\CLAUDE.md <workspace>\CLAUDE.md
-```
-
-```bash
-# bash
-cp assets/workspace/CLAUDE.md <workspace>/CLAUDE.md
-```
-
-Edit `CLAUDE.md` to fill in the project overview and workspace conventions sections.
+`init --client 2` also copies `CLAUDE.md` delegation rules into the workspace root.
 
 ---
 
 ### Cursor
 
-Copy the MCP config and rules:
-
-```powershell
-# PowerShell
-mkdir <workspace>\.cursor\rules -ErrorAction SilentlyContinue
-copy assets\workspace\.cursor\mcp.json <workspace>\.cursor\mcp.json
-copy assets\workspace\.cursor\rules\task-offloader.mdc <workspace>\.cursor\rules\task-offloader.mdc
-```
-
-```bash
-# bash
-mkdir -p <workspace>/.cursor/rules
-cp assets/workspace/.cursor/mcp.json <workspace>/.cursor/mcp.json
-cp assets/workspace/.cursor/rules/task-offloader.mdc <workspace>/.cursor/rules/task-offloader.mdc
-```
-
-Edit `<workspace>/.cursor/mcp.json`:
+`<workspace>/.cursor/mcp.json`:
 
 ```json
 {
@@ -212,50 +195,27 @@ Edit `<workspace>/.cursor/mcp.json`:
 }
 ```
 
-`task-offloader.mdc` has `alwaysApply: true` in its frontmatter — Cursor loads it automatically.
+`init --client 3` also copies `.cursor/rules/task-offloader.mdc` (has `alwaysApply: true`).
 
 ---
 
 ### Antigravity / Gemini
 
-Copy the rules and skill:
+`init --client 4` copies:
+- `rules/task-offloader.md` — loaded automatically by Antigravity
+- `skills/task-offloader/SKILL.md` — invoked when the agent sees large files or log paths
 
-```powershell
-# PowerShell
-mkdir <workspace>\rules -ErrorAction SilentlyContinue
-mkdir <workspace>\skills\task-offloader -ErrorAction SilentlyContinue
-copy assets\workspace\rules\task-offloader.md <workspace>\rules\task-offloader.md
-copy assets\workspace\skills\task-offloader\SKILL.md <workspace>\skills\task-offloader\SKILL.md
-```
-
-```bash
-# bash
-mkdir -p <workspace>/rules
-mkdir -p <workspace>/skills/task-offloader
-cp assets/workspace/rules/task-offloader.md <workspace>/rules/task-offloader.md
-cp assets/workspace/skills/task-offloader/SKILL.md <workspace>/skills/task-offloader/SKILL.md
-```
-
-Antigravity loads `rules/*.md` automatically. The skill is invoked when the agent sees large files or log paths.
-
-For wiring the MCP server into Antigravity's agent config, see [Integration Guide](integration.md).
+For MCP server registration in Antigravity's agent config, see [Integration Guide](integration.md).
 
 ---
 
 ## Multiple workspaces
 
-Each workspace needs its own `.task-offloader/` config; the agent binary is shared.
-
-```powershell
-# PowerShell
-mkdir <workspace-B>\.task-offloader
-copy assets\workspace\profile.toml <workspace-B>\.task-offloader\
-```
+Each workspace needs its own `.task-offloader/`; the agent binary is shared.
 
 ```bash
-# bash
-mkdir -p <workspace-B>/.task-offloader
-cp assets/workspace/profile.toml <workspace-B>/.task-offloader/
+cd <workspace-B>
+task-offloader init
 ```
 
 Set a distinct `profile.name` in each `profile.toml` so audit logs identify the workspace. Full layout reference: [Workspace Config](workspace-config.md).

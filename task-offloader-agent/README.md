@@ -66,43 +66,53 @@ pip install -e .
 task-offloader --version
 ```
 
-### 3 — Create workspace config
+### 3 — Initialise a workspace
+
+Run from inside your project directory:
 
 ```bash
-# Windows
-mkdir <your-workspace>\.task-offloader
-copy assets\workspace\profile.toml <your-workspace>\.task-offloader\
-
-# macOS / Linux
-mkdir -p <your-workspace>/.task-offloader
-cp assets/workspace/profile.toml <your-workspace>/.task-offloader/
+cd <your-workspace>
+task-offloader init
 ```
 
-### 4 — Edit profile
+The command:
+- creates `.task-offloader/` with `profile.toml` pre-filled with your model
+- detects which AI clients exist (VS Code, Cursor, Claude, Antigravity) and wires the MCP server
+- prints a checklist of what was created or skipped
 
-Open `<workspace>/.task-offloader/profile.toml` and set:
+**Options:**
 
-```toml
-[inference]
-model   = "qwen2.5-coder:7b"   # any tag from ollama list
-num_ctx = 16384
+```bash
+task-offloader init --model qwen2.5-coder:7b   # skip model prompt
+task-offloader init --client 1 3               # wire only Copilot + Cursor (numbered menu)
+task-offloader init --force                    # overwrite existing client configs
+task-offloader init --dry-run                  # preview without writing
 ```
 
-### 5 — Wire to your AI client
+Client numbers: `1` VS Code/Copilot · `2` Claude Desktop · `3` Cursor · `4` Antigravity · `5` All.
 
-See [docs/setup.md -> Step 5](docs/setup.md#step-5--wire-to-your-ai-client) for Copilot, Claude, Cursor, and Antigravity.
+### 4 — Validate
+
+```bash
+task-offloader profile check
+```
+
+Fix any reported errors, then restart your AI client.
 
 ---
 
 ## On / Off
 
 ```bash
-task-offloader --workspace <ws> --profile <ws>/.task-offloader/profile.toml off     # pause
-task-offloader --workspace <ws> --profile <ws>/.task-offloader/profile.toml on      # resume
-task-offloader --workspace <ws> --profile <ws>/.task-offloader/profile.toml status  # state
+task-offloader on      # resume (uses .task-offloader/ defaults)
+task-offloader off     # pause
+task-offloader status  # state, provider health, token counter
 ```
 
-See [Configuration -> Operating modes](docs/configuration.md#operating-modes) for per-tool control.
+> [!NOTE]
+> Without `--workspace` and `--profile` flags, the CLI reads `TASK_OFFLOADER_WORKSPACE` and `TASK_OFFLOADER_PROFILE` env vars, or uses the `.task-offloader/task-offloader.ps1` wrapper created by `init`.
+
+See [Configuration → Operating modes](docs/configuration.md#operating-modes) for per-tool control.
 
 ---
 
@@ -121,7 +131,7 @@ python -m pytest tests/integration/           # requires Ollama + model running
 
 | Document | Description |
 |---|---|
-| [Setup Guide](docs/setup.md) | Install, per-client MCP wiring, multi-workspace |
+| [Setup Guide](docs/setup.md) | Install, `init` command, multi-workspace |
 | [Workspace Config](docs/workspace-config.md) | `.task-offloader/` layout, `profile.toml`, `switch.json` |
 | [Configuration Reference](docs/configuration.md) | CLI flags, env vars, profile keys, result contract |
 | [Architecture](docs/architecture.md) | Layer diagram, call path, token budget |

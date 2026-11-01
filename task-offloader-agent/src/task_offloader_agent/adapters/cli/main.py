@@ -1,4 +1,4 @@
-"""Command line `task-offloader`: the MCP server, switch commands, CLI versions of the tools, profile check."""
+﻿"""Command line `task-offloader`: the MCP server, switch commands, CLI versions of the tools, profile check."""
 
 from __future__ import annotations
 
@@ -196,7 +196,34 @@ def main(argv: list[str] | None = None) -> int:
             audit.write(settings, {"event": "rated", "run_id": args.run_id, "rating": args.rating})
             print(f"{args.run_id}: {args.rating}")
         elif args.cmd == "report":
-            print(report.build(settings), end="")
+            text, code = report.build(
+                settings,
+                audit_file=Path(args.audit_file) if getattr(args, "audit_file", None) else None,
+                fail_on_bad_rate=getattr(args, "fail_on_bad_rate", False),
+            )
+            print(text, end="")
+            if code:
+                return code
+        elif args.cmd == "summary":
+            text = report.summary(
+                settings,
+                days=args.days,
+                audit_file=Path(args.audit_file) if getattr(args, "audit_file", None) else None,
+            )
+            print(text, end="")
+        elif args.cmd == "rate-pending":
+            pending = report.pending_ratings(settings)
+            if not pending:
+                print("No unrated results.")
+            else:
+                for e in pending:
+                    run_id = e.get("run_id", "?")
+                    summ = e.get("summary", "(no summary)")
+                    print(f"\n{run_id}: {summ}")
+                    raw = input("  Rate (good/bad/skip) [skip]: ").strip() or "skip"
+                    if raw in ("good", "bad"):
+                        audit.write(settings, {"event": "rated", "run_id": run_id, "rating": raw})
+                        print(f"  saved: {raw}")
         elif args.cmd == "clean":
             removed, errors = retention.clean(settings, args.days)
             days = settings.retention_days if args.days is None else args.days
