@@ -98,20 +98,40 @@ def check_loopback(url: str) -> str:
 
 
 def _workspace(raw: str | None) -> Path:
-    if not raw:
-        raise ConfigError("no workspace: pass --workspace or set TASK_OFFLOADER_WORKSPACE")
-    try:
-        root = Path(raw).resolve(strict=True)
-    except (OSError, RuntimeError):
-        raise ConfigError(f"workspace {raw!r} does not exist") from None
-    if not root.is_dir():
-        raise ConfigError(f"workspace {raw!r} is not a directory")
-    return root
+    """Resolve workspace root.
+
+    Priority: explicit arg > env var > CWD auto-detection (.task-offloader/profile.toml present).
+    """
+    if raw:
+        try:
+            root = Path(raw).resolve(strict=True)
+        except (OSError, RuntimeError):
+            raise ConfigError(f"workspace {raw!r} does not exist") from None
+        if not root.is_dir():
+            raise ConfigError(f"workspace {raw!r} is not a directory")
+        return root
+
+    # Auto-detect: if CWD contains .task-offloader/profile.toml, use CWD
+    cwd = Path.cwd().resolve()
+    if (cwd / ".task-offloader" / "profile.toml").exists():
+        return cwd
+
+    raise ConfigError(
+        "no workspace: pass --workspace, set TASK_OFFLOADER_WORKSPACE, "
+        "or run from a directory that contains .task-offloader/profile.toml"
+    )
 
 
 def _profile_path(raw: str | None, root: Path) -> Path:
+    # Auto-detect: use default profile.toml inside the resolved workspace
     if not raw:
-        raise ConfigError("no profile: pass --profile or set TASK_OFFLOADER_PROFILE")
+        default = root / ".task-offloader" / "profile.toml"
+        if default.exists():
+            return default.resolve()
+        raise ConfigError(
+            "no profile: pass --profile, set TASK_OFFLOADER_PROFILE, "
+            "or run `task-offloader init` to create .task-offloader/profile.toml"
+        )
     path = Path(raw)
     path = path if path.is_absolute() else root / path
     try:
