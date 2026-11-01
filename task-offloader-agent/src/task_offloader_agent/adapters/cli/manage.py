@@ -73,6 +73,18 @@ def run_upgrade() -> int:
     print()
 
     # --- pip install -e . ---
+    # On Windows the running .exe is locked by the OS, so pip cannot replace it
+    # while this process is alive.  Print manual instructions instead.
+    import platform as _platform
+    if _platform.system() == "Windows":
+        print()
+        print("Windows: the running executable is locked and cannot replace itself.")
+        print("Open a NEW terminal and run:")
+        print(f"  pip install -e \"{repo_dir}\"")
+        print()
+        print("Then restart your AI client to pick up any MCP protocol changes.")
+        return 0
+
     print("Reinstalling package...")
     result = subprocess.run(
         [sys.executable, "-m", "pip", "install", "-e", str(repo_dir)],
