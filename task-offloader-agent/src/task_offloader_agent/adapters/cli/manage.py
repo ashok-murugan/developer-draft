@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import platform
 import shutil
 import subprocess
@@ -42,22 +43,43 @@ def _find_git_root(repo_dir: Path) -> Path | None:
 # ---------------------------------------------------------------------------
 
 def _stop_service() -> None:
-    """Kill any running task-offloader MCP server processes."""
+    """Kill the task-offloader MCP server process without killing the calling process."""
     system = platform.system()
+    own_pid = os.getpid()
     print("Stopping task-offloader service...")
 
     if system == "Windows":
-        # taskkill finds processes by image name; /F = force, /T = include children
+        # Use wmic to find task-offloader.exe processes whose command line contains " mcp"
+        # (the MCP server subcommand), then kill by PID — never by image name, which would
+        # also kill this upgrade/uninstall process.
         result = subprocess.run(
-            ["taskkill", "/F", "/T", "/IM", "task-offloader.exe"],
+            [
+                "wmic", "process",
+                "where", "name='task-offloader.exe' and commandline like '% mcp%'",
+                "get", "processid", "/format:value",
+            ],
             capture_output=True, text=True,
         )
-        if "not found" in result.stderr.lower() or "no tasks" in result.stdout.lower():
+        pids = []
+        for line in result.stdout.splitlines():
+            line = line.strip()
+            if line.startswith("ProcessId="):
+                try:
+                    pid = int(line.split("=", 1)[1].strip())
+                    if pid and pid != own_pid:
+                        pids.append(pid)
+                except ValueError:
+                    pass
+
+        if not pids:
             print("  (no running service found)")
         else:
-            print(f"  {result.stdout.strip() or result.stderr.strip()}")
+            for pid in pids:
+                subprocess.run(["taskkill", "/F", "/T", "/PID", str(pid)],
+                               capture_output=True)
+            print(f"  stopped {len(pids)} process(es).")
     else:
-        # POSIX: pkill matches the script/entry-point name
+        # POSIX: pkill by command pattern — does not match the upgrade/uninstall caller
         result = subprocess.run(
             ["pkill", "-f", "task-offloader.*mcp"],
             capture_output=True, text=True,
