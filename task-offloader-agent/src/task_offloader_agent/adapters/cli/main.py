@@ -1,4 +1,4 @@
-﻿"""Command line `task-offloader`: the MCP server, switch commands, CLI versions of the tools, profile check."""
+"""Command line `task-offloader`: the MCP server, switch commands, CLI versions of the tools, profile check."""
 
 from __future__ import annotations
 
@@ -122,6 +122,8 @@ def _parser() -> argparse.ArgumentParser:
                    help="overwrite existing client config files")
     p.add_argument("--dry-run", action="store_true",
                    help="print actions without writing")
+    sub.add_parser("upgrade", help="pull latest code and reinstall")
+    sub.add_parser("uninstall", help="remove task-offloader-agent from the current venv")
     return parser
 
 
@@ -144,6 +146,12 @@ def main(argv: list[str] | None = None) -> int:
             force=getattr(args, "force", False),
             dry_run=getattr(args, "dry_run", False),
         )
+    if args.cmd == "upgrade":
+        from .manage import run_upgrade
+        return run_upgrade()
+    if args.cmd == "uninstall":
+        from .manage import run_uninstall
+        return run_uninstall()
     try:
         config = load_config(workspace=args.workspace, profile=args.profile, mode=args.mode)
     except ConfigError as exc:
