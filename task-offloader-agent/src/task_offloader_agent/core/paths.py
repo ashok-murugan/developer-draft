@@ -18,7 +18,7 @@ from .profile import PathRule, Profile
 # `*secret*` / `*credential*` apply only to configuration and data files, so
 # source files such as SecretRedactor.java stay readable.
 CONFIG_SUFFIXES = {".properties", ".yml", ".yaml", ".json", ".env", ".txt", ".xml"}
-KEY_SUFFIXES = (".keystore", ".jks", ".p12", ".pfx", ".pem")
+KEY_SUFFIXES = (".keystore", ".jks", ".p12", ".pfx", ".pem", ".key", ".cer")
 KEY_PREFIXES = ("id_rsa", "id_dsa", "id_ecdsa", "id_ed25519")
 WRAPPER_DIR = ".task-offloader"
 READABLE_WRAPPER = (WRAPPER_DIR, "run", "out")

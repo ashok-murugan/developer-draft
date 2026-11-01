@@ -115,6 +115,18 @@ def _print_profile(config: Config) -> None:
           f"max {profile.log_max_files} file(s)")
     print(f"  prompts:    {profile.prompts_dir if profile.prompts_dir else 'packaged defaults'}")
 
+    # Extra validation warnings
+    root = settings.root
+    for rule in profile.deny_paths:
+        candidate = root / rule.raw.lstrip("**/")
+        if not candidate.exists():
+            print(f"  warning:    deny_path {rule.raw!r} does not exist in this workspace")
+    deny_path_parts = {rule.parts for rule in profile.deny_paths}
+    for log_rule in profile.log_dirs:
+        for deny_rule in profile.deny_paths:
+            if deny_rule.matches(log_rule.parts) or log_rule.matches(deny_rule.parts):
+                print(f"  warning:    logs.allowed_dir {log_rule.raw!r} overlaps deny_path {deny_rule.raw!r}")
+
 
 async def _stderr_progress(done: float, total: float, message: str) -> None:
     print(f"[{done:.0f}/{total:.0f}] {message}", file=sys.stderr)
@@ -180,6 +192,7 @@ def _parser() -> argparse.ArgumentParser:
     p.add_argument("--dry-run", action="store_true",
                    help="print actions without writing")
     sub.add_parser("upgrade", help="pull latest code and reinstall")
+    sub.add_parser("restart", help="stop the running MCP server (AI client restarts it automatically)")
     sub.add_parser("uninstall", help="remove task-offloader-agent from the current venv")
     return parser
 
@@ -206,6 +219,9 @@ def main(argv: list[str] | None = None) -> int:
     if args.cmd == "upgrade":
         from .manage import run_upgrade
         return run_upgrade()
+    if args.cmd == "restart":
+        from .manage import run_restart
+        return run_restart()
     if args.cmd == "uninstall":
         from .manage import run_uninstall
         return run_uninstall()

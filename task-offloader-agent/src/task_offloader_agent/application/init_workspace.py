@@ -147,7 +147,7 @@ def _render_ps1_wrapper(bin_path: Path, workspace: Path) -> str:
         f'$bin     = "{bin_str}"\n'
         f'$ws      = "{ws_str}"\n'
         f'$profile = "{prof_str}"\n'
-        "& $bin --workspace $ws --profile $profile @args\n"
+        f'& \"{bin_str}\" --workspace \"$PSScriptRoot\\..\" --profile \"$PSScriptRoot\\profile.toml\" @args\n'
     )
 
 
@@ -158,7 +158,8 @@ def _render_cmd_wrapper(bin_path: Path, workspace: Path) -> str:
     prof_str = str(workspace / ".task-offloader" / "profile.toml")
     return (
         "@echo off\n"
-        f'"{bin_str}" --workspace "{ws_str}" --profile "{prof_str}" %*\n'
+        "setlocal\n"
+        f'"{bin_str}" --workspace "%~dp0.." --profile "%~dp0profile.toml" %*\n'
     )
 
 
@@ -168,11 +169,17 @@ def _render_profile(name: str, model: str, has_logs: bool) -> str:
 
 
 def _render_vscode_mcp(bin_path: Path) -> str:
+    try:
+        home = Path.home()
+        rel = bin_path.relative_to(home)
+        cmd = "${userHome}/" + rel.as_posix()
+    except ValueError:
+        cmd = venv_bin_str(bin_path, bin_path)  # fallback: absolute
     return json.dumps({
         "servers": {
             "task-offloader": {
                 "type": "stdio",
-                "command": venv_bin_str(bin_path, bin_path),
+                "command": cmd,
                 "args": [
                     "--workspace", "${workspaceFolder}",
                     "--profile",   "${workspaceFolder}/.task-offloader/profile.toml",

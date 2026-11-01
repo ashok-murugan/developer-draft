@@ -160,6 +160,19 @@ def run_upgrade() -> int:
 
 
 # ---------------------------------------------------------------------------
+# restart
+# ---------------------------------------------------------------------------
+
+def run_restart() -> int:
+    """Stop the running MCP server so the AI client restarts it automatically."""
+    _stop_service()
+    print("The MCP server has been stopped.")
+    print("Your AI client will restart it automatically on the next tool call.")
+    print("If it does not restart, reload the MCP server in your AI client settings.")
+    return 0
+
+
+# ---------------------------------------------------------------------------
 # uninstall
 # ---------------------------------------------------------------------------
 

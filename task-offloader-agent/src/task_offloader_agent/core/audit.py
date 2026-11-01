@@ -69,6 +69,7 @@ def log(settings: Settings, message: str) -> None:
     print(f"task-offloader: {line}", file=sys.stderr, flush=True)
     try:
         settings.run_dir.mkdir(parents=True, exist_ok=True)
+        _rotate_if_needed(settings.log_file, _LOG_MAX_BYTES)
         with _thread_lock, open(settings.log_file, "a", encoding="utf-8") as f:
             f.write(line + "\n")
     except OSError:
@@ -83,11 +84,27 @@ def _summary(event: dict[str, Any]) -> str:
     return " ".join(p for p in parts if p)
 
 
+_AUDIT_MAX_BYTES  = 10 * 1024 * 1024   # 10 MB
+_LOG_MAX_BYTES    =  5 * 1024 * 1024   #  5 MB
+
+
+def _rotate_if_needed(path: Path, max_bytes: int) -> None:
+    """Rename path -> path.1 when it exceeds max_bytes. Best effort; never raises."""
+    try:
+        if path.exists() and path.stat().st_size > max_bytes:
+            backup = path.with_suffix(path.suffix + ".1")
+            if backup.exists():
+                backup.unlink(missing_ok=True)
+            path.rename(backup)
+    except OSError:
+        pass
+
 def write(settings: Settings, event: dict[str, Any]) -> None:
     """Append one event. Raises OSError if the audit file cannot be written."""
     line = json.dumps({"ts": now_iso(), **event}, ensure_ascii=False) + "\n"
     data = line.encode("utf-8")
     settings.run_dir.mkdir(parents=True, exist_ok=True)
+    _rotate_if_needed(settings.audit_file, _AUDIT_MAX_BYTES)
     with _thread_lock, _file_lock(settings.lock_file):
         with open(settings.audit_file, "ab", buffering=0) as f:
             f.write(data)

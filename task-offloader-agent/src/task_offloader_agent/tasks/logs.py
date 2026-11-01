@@ -84,7 +84,13 @@ async def run_logs(ctx: RunContext, files: list[str], since: str | None, until: 
     warnings = list(digest.warnings)
     if redacted:
         warnings.append("redacted in digest: " + ", ".join(f"{k} x{n}" for k, n in sorted(redacted.items())))
-    metrics.update(input_chars=digest.input_chars, digest_chars=len(markdown), entries=digest.entries)
+    metrics.update(input_chars=digest.input_chars, digest_chars=len(markdown),
+                   entries=digest.entries, lines_read=digest.lines_read)
+    if digest.lines_read > 0 and digest.entries == 0:
+        warnings.append(f"0 of {digest.lines_read:,} lines matched — check your pattern or time range")
+    elif digest.lines_read > 0 and digest.entries < digest.lines_read // 100:
+        warnings.append(f"{digest.entries} of {digest.lines_read:,} lines matched "
+                        f"({digest.entries * 100 // digest.lines_read}%)")
     num_predict = NUM_PREDICT["logs_narrative"]
     budget = {"digest_tokens": digest_tokens, "narrative_cap": DIGEST_NARRATIVE_CAP,
               "input_limit": input_limit(settings.num_ctx, num_predict), "tokenizer": counter.kind}

@@ -150,6 +150,7 @@ class Digest:
     duplicates: int = 0
     collapsed: int = 0
     input_chars: int = 0
+    lines_read: int = 0
     warnings: list[str] = field(default_factory=list)
 
 
@@ -229,6 +230,7 @@ def build_digest(paths: list[tuple[str, Path]], filters: Filters, formats: Seque
         input_chars += sum(line_chars) + len(line_chars)
 
     warnings: list[str] = []
+    digest.lines_read = sum(f.total_lines for f in files.values())
     if corr:
         if correlated and not (filters.since or filters.until):
             times = [e.ts for e in correlated if e.ts]
