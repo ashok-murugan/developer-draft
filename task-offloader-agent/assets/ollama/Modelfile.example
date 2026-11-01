@@ -1,0 +1,18 @@
+# Ollama Modelfile template for TaskOffloaderAgent
+# -------------------------------------------------------
+# 1. Replace the FROM line with any Ollama model you have pulled.
+# 2. Set num_ctx to match [inference].num_ctx in your profile.toml.
+# 3. Create the named model:
+#      ollama create <your-model-name> -f Modelfile
+#    Then set [inference].model = "<your-model-name>" in your profile.toml.
+#
+# You are free to choose any name — no name is prescribed.
+# You can create multiple named models (one per model variant or task type)
+# and point different profiles at each one.
+
+FROM <model-tag>          # e.g. qwen2.5-coder:7b  |  codellama:7b  |  deepseek-coder:6.7b
+
+PARAMETER num_ctx         16384   # match [inference].num_ctx in your profile
+PARAMETER temperature     0.2     # low temperature: factual, consistent
+PARAMETER top_p           0.9
+PARAMETER repeat_penalty  1.05

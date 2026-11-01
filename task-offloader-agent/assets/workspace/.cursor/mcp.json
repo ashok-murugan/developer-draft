@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "task-offloader": {
+      "type": "stdio",
+      "command": "<venv>/Scripts/task-offloader.exe",
+      "args": [
+        "--workspace", "<workspace>",
+        "--profile",   "<workspace>/.task-offloader/profile.toml",
+        "mcp"
+      ]
+    }
+  }
+}

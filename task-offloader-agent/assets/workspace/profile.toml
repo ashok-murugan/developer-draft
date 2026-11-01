@@ -1,0 +1,69 @@
+# TaskOffloaderAgent — workspace configuration
+# Copy this file to: <workspace>/.task-offloader/profile.toml
+# Then edit it: set [profile].name, [inference].model, [security].deny_paths, [logs].formats, etc.
+# Validate with: task-offloader --workspace <ws> --profile <file> profile check
+
+[profile]
+name = "my-workspace"        # a human-readable label for logs and the audit trail
+schema_version = 1           # do not change — only schema version 1 is supported
+
+# ---------------------------------------------------------------------------
+# Inference — which local model to use
+# ---------------------------------------------------------------------------
+[inference]
+provider  = "ollama"          # only "ollama" is supported; the endpoint must be on loopback
+model     = "qwen2.5-coder:7b"
+num_ctx   = 16384             # context window in tokens — must match what Ollama was given
+# tokenizer = "cache/tokenizer.json"
+#   Path relative to this file.  Download the tokenizer.json for your model from HuggingFace.
+#   Without it, token counts are estimated at 3 chars/token (still safe — the budget is conservative).
+
+# ---------------------------------------------------------------------------
+# Security — what the agent may never read inside the workspace
+# ---------------------------------------------------------------------------
+[security]
+# deny_paths: workspace-relative, forward-slash separated.
+#   "private"          → anchored to workspace root (private/ only).
+#   "**/credentials"   → credentials/ folder anywhere in the tree.
+#   A rule covers all descendants automatically.
+deny_paths = ["private", "**/credentials", "**/secrets"]
+
+# deny_names: file-name globs without any folder component.
+deny_names = ["*.local.json", "*.local.toml", ".env.local"]
+
+# ---------------------------------------------------------------------------
+# Redaction — secrets replaced with <redacted:kind> before reaching the model
+# ---------------------------------------------------------------------------
+[redaction]
+# Built-in rules already cover: Authorization headers, cookies, session IDs,
+# CSRF tokens, passwords, generic tokens, and e-mail addresses.
+# Add project-specific patterns below.
+
+# Example: redact an API key while keeping the key name visible
+# [[redaction.rules]]
+# kind         = "api-key"
+# pattern      = '(?i)\b(x-api-key\s*[:=]\s*)[^\s,;]+'
+# keep_prefix  = true   # group 1 is kept; the rest is replaced
+
+# ---------------------------------------------------------------------------
+# Logs — which directories and formats summarize_logs may access
+# ---------------------------------------------------------------------------
+[logs]
+allowed_dirs = ["logs"]   # workspace-relative folders; sub-paths inherit access
+max_files    = 10         # maximum number of files accepted in a single call
+
+# Header-format definitions (tried in order; built-in generic format is the final fallback).
+# Required named groups: level, ts, msg.  Optional: thread, logger.
+[[logs.formats]]
+name    = "app"
+pattern = '^(?P<ts>\d{4}-\d{2}-\d{2}T[\d:.,]+(?:Z|[+-]\d{2}:?\d{2})?) (?P<level>[A-Z]+) (?P<logger>\S+) - (?P<msg>.*)$'
+
+# ---------------------------------------------------------------------------
+# Prompts — override the packaged system prompts with workspace-specific ones
+# ---------------------------------------------------------------------------
+# [prompts]
+# override_dir = "prompts"
+#   A folder next to this file.  Only files whose names match a packaged prompt
+#   are accepted (ask_system.txt, ask_chunk.txt, ask_merge.txt,
+#   logs_system.txt, logs_narrative.txt).
+

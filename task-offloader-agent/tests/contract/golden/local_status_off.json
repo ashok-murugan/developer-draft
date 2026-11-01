@@ -1,0 +1,29 @@
+{
+  "status": "ok",
+  "for": "copilot-review",
+  "mode": "off",
+  "switch": {
+    "source": "file",
+    "error": null,
+    "warnings": []
+  },
+  "tools": {
+    "local_status": "on",
+    "local_ask": "off (mode=off)",
+    "summarize_logs": "off (mode=off)"
+  },
+  "ollama": {
+    "reachable": true,
+    "model": "my-coder",
+    "model_present": true
+  },
+  "profile": "fixture",
+  "num_ctx": 16384,
+  "timeout_s": 180.0,
+  "tokenizer": "estimate (3 chars per token)",
+  "running": 0,
+  "queued": 0,
+  "max_pending": 3,
+  "queue_length": 0,
+  "next_step": "TaskOffloaderAgent is off. Do every task yourself; do not call its other tools."
+}

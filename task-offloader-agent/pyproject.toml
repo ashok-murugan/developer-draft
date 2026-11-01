@@ -1,0 +1,50 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "task-offloader-agent"
+version = "0.1.0"
+description = "A local-model MCP service that a primary AI coding agent delegates bounded subtasks to — file summarisation, log triage, and code questions — using any Ollama model, with strict workspace security and a full audit trail."
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [{ name = "Ashok Murugan" }]
+keywords = [
+  "mcp", "ollama", "local-llm", "ai-agent",
+  "developer-tools", "code-assistant", "task-offload",
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Software Development :: Libraries :: Application Frameworks",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "mcp>=2.3,<3",
+    "httpx>=0.27",
+    "pydantic>=2.11",
+    "tokenizers>=0.20",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+
+[project.urls]
+Repository   = "https://github.com/ashok-murugan/task-offloader-agent"
+"Bug Tracker" = "https://github.com/ashok-murugan/task-offloader-agent/issues"
+
+[project.scripts]
+task-offloader = "task_offloader_agent.adapters.cli.main:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+task_offloader_agent = ["prompts/*.txt"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

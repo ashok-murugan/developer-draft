@@ -1,0 +1,9 @@
+Input, part $part of $parts:
+$chunk
+
+Task: $instruction
+
+Answer in at most $max_words words, using only the input above.
+End every claim with its citation in parentheses, for example: ($example)
+If this part has nothing relevant to the task, reply exactly: NOTHING RELEVANT
+$retry_note

@@ -1,0 +1,26 @@
+[profile]
+name = "fixture"
+schema_version = 1
+
+[security]
+deny_paths = ["private", "**/app-config/security"]
+deny_names = ["config.local.json"]
+
+[redaction]
+rules = [
+  { kind = "api-key",   pattern = '(?i)\b(MY_APP_API_KEY["\x27]?\s*[:=]\s*["\x27]?)[^\s,;"\x27<>]+', keep_prefix = true },
+  { kind = "app-token", pattern = '(?i)\b(app_token["\x27]?\s*[:=]\s*["\x27]?)[^\s,;"\x27<>]+', keep_prefix = true },
+]
+
+[logs]
+allowed_dirs = ["logs"]
+max_files = 10
+
+[[logs.formats]]
+name = "app"
+pattern = '^(?P<level>TRACE|DEBUG|INFO|WARN|WARNING|ERROR|FATAL|SEVERE)\s+\((?P<ts>\d{4}-\d{2}-\d{2}T[\d:]+(?:[.,]\d+)?(?:Z|[+-]\d{2}:?\d{2})?)\)\s+\[(?P<thread>[^\]]*)\]\s+(?P<logger>\S+?)(?::\d+)?\s+-\s?(?P<msg>.*)$'
+
+[inference]
+provider = "ollama"
+model = "my-coder"
+num_ctx = 16384

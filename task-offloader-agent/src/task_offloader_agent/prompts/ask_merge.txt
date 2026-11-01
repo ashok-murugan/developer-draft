@@ -1,0 +1,11 @@
+Notes written from $parts parts of the input, each with citations:
+
+$notes
+
+Task: $instruction
+
+Merge the notes into one answer in at most $max_words words.
+- Keep every citation exactly as written in the notes, in parentheses after its claim. Do not invent new ones.
+- Skip notes that say NOTHING RELEVANT.
+- If notes contradict each other, say so.
+$retry_note

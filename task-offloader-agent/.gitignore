@@ -1,0 +1,29 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Test / coverage cache
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Task-offloader runtime files
+.task-offloader/run/*
+!.task-offloader/run/.gitkeep
+.task-offloader/cache/
+
+# OS / Editor artifacts
+.DS_Store
+Thumbs.db

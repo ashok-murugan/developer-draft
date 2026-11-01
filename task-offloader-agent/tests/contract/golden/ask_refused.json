@@ -1,0 +1,18 @@
+{
+  "run_id": "<RUN_ID>",
+  "status": "refused",
+  "for": "copilot-review",
+  "summary": "Input is 27,991 tokens; the limit for this call is 2,000.",
+  "answer": null,
+  "citations": [],
+  "files": [],
+  "apply": null,
+  "checks": {},
+  "budget": {
+    "input_tokens": 27991,
+    "input_limit": 2000
+  },
+  "warnings": [],
+  "review": "spot-check-citations",
+  "next_step": "Narrow the input: pass line ranges (path:L120-L300) or fewer files; at most 2 parts of 1,000 tokens fit one call. Otherwise do this task yourself."
+}

@@ -1,0 +1,15 @@
+GET /api/v1/resource HTTP/1.1
+Authorization: Bearer <redacted:bearer>
+Authorization: <redacted:authorization>
+Cookie: <redacted:cookie>
+Set-Cookie: <redacted:cookie>
+X-CSRF-Token: <redacted:csrf>
+MY_APP_API_KEY=<redacted:api-key>
+app_token: <redacted:app-token>
+jwt <redacted:token>
+jdbc:sqlserver://h:1433;databaseName=d;user=sa;password=<redacted:password>;encrypt=true
+https://host/path?user=bob&password=<redacted:password>&b=1
+{"password": "<redacted:password>", "pwd":"<redacted:password>", "passwd" : '<redacted:password>'}
+contact: <redacted:email> and <redacted:email>
+already <redacted:bearer> is left alone, and bearer short stays
+no secrets on this line at all

@@ -1,0 +1,11 @@
+{
+  "authorization": 1,
+  "bearer": 1,
+  "cookie": 2,
+  "csrf": 1,
+  "email": 2,
+  "password": 5,
+  "api-key": 1,
+  "app-token": 1,
+  "token": 1
+}

@@ -1,0 +1,5 @@
+$focus
+Write a short narrative, at most $max_words words: the main errors in time order, how they seem to relate, and which one looks like the first cause. Cite a line for every claim.
+$retry_note
+Digest:
+$digest

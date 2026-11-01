@@ -1,0 +1,46 @@
+---
+description: Delegation rules for TaskOffloaderAgent MCP tools. Applied when working with large files, log triage, or code questions that exceed direct context.
+globs:
+alwaysApply: true
+---
+
+# TaskOffloaderAgent delegation rules
+
+The agent is **read-only**. It never writes, moves, or deletes files.
+Tools: `local_status`, `local_ask`, `summarize_logs`.
+
+## When to delegate
+
+Use `local_ask` when:
+- A file or set of files exceeds ~200 lines and the question is self-contained.
+- You need a first-pass summary before reading the file yourself.
+
+Use `summarize_logs` when:
+- The user mentions a log, crash, or error you have not yet seen.
+- A log path is given or inferable from workspace layout.
+
+Use `local_status` when:
+- First tool call of the session — confirm agent is reachable.
+- A previous call returned `provider_unavailable` or `failed`.
+
+Do NOT use TaskOffloaderAgent when:
+- The task requires writing or deleting files.
+- The question requires whole-codebase understanding.
+- `local_status` reports `mode: off` — handle the task yourself instead.
+
+## After every call
+
+Check `next_step`:
+- `"present_to_user"` → show the answer
+- `"verify_and_present"` → read `review` and address it first
+- `"split_input_and_retry"` → split file list in half and retry each half
+- `"check_status"` → call `local_status` before retrying
+- `"fallback_to_primary"` → handle the task yourself
+
+Check `review` — if non-empty, verify the flagged point before presenting.
+Trust `citations` — they are code-verified line-range references.
+
+## Controlling the agent
+
+User says "pause offloader": run `task-offloader --workspace . off`
+User says "resume": run `task-offloader --workspace . on`

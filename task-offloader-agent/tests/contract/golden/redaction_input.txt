@@ -1,0 +1,15 @@
+GET /api/v1/resource HTTP/1.1
+Authorization: Bearer abcdefghijklmnop1234567890
+Authorization: Basic dXNlcjpwYXNz
+Cookie: a=1; JSESSIONID=ABC123DEF456; theme=dark
+Set-Cookie: JSESSIONID=XYZ789; Path=/
+X-CSRF-Token: csrf-token-value-123
+MY_APP_API_KEY=app-secret-key-1
+app_token: app-token-secret-value
+jwt eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0In0.c2lnbmF0dXJl
+jdbc:sqlserver://h:1433;databaseName=d;user=sa;password=hunter2;encrypt=true
+https://host/path?user=bob&password=hunter3&b=1
+{"password": "hunter4", "pwd":"s3cr3t", "passwd" : 'abc'}
+contact: first.last+tag@example.co.uk and plain@host.io
+already <redacted:bearer> is left alone, and bearer short stays
+no secrets on this line at all

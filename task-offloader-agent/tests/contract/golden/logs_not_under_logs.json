@@ -1,0 +1,19 @@
+{
+  "run_id": "<RUN_ID>",
+  "status": "failed",
+  "for": "copilot-review",
+  "summary": "TaskOffloaderAgent could not complete the task: only files under logs/ are accepted: src/x.log.",
+  "answer": null,
+  "citations": [],
+  "files": [],
+  "apply": null,
+  "checks": {},
+  "budget": {},
+  "warnings": [],
+  "review": "narrative-only",
+  "next_step": "Do this task yourself and continue.",
+  "error": {
+    "code": "invalid_input",
+    "retryable": false
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "mode_off": {
+    "status": "disabled",
+    "for": "copilot-review",
+    "summary": "TaskOffloaderAgent is switched off (mode=off).",
+    "next_step": "Do this task yourself. Do not call task-offloader tools again in this conversation unless the developer asks.",
+    "error": {
+      "code": "switched_off",
+      "retryable": false
+    }
+  },
+  "tool_flag": {
+    "status": "disabled",
+    "for": "copilot-review",
+    "summary": "Tool summarize_logs is switched off (tools.summarize_logs=false).",
+    "next_step": "Do this task yourself. Do not call summarize_logs again in this conversation unless the developer asks. Other task-offloader tools may still be on.",
+    "error": {
+      "code": "tool_off",
+      "retryable": false
+    }
+  }
+}

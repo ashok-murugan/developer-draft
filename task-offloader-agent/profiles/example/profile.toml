@@ -1,0 +1,35 @@
+[profile]
+name = "example"
+schema_version = 1
+
+[inference]
+provider = "ollama"
+model = "qwen2.5-coder:7b"
+num_ctx = 16384
+# tokenizer = "cache/tokenizer.json"   # path relative to this file; without it token counts are estimates
+
+[security]
+# Rules are workspace-relative, '/'-separated. `a/b` matches only at the workspace root;
+# `**/a/b` matches anywhere. A rule also covers everything below it.
+deny_paths = ["private", "**/credentials"]
+deny_names = ["*.local.json"]
+
+[redaction]
+# Added after the built-in rules. `keep_prefix = true` keeps capture group 1 and replaces the rest.
+[[redaction.rules]]
+kind = "api-key"
+pattern = '(?i)\b(x-api-key\s*[:=]\s*)[^\s,;]+'
+keep_prefix = true
+
+[logs]
+allowed_dirs = ["logs"]
+max_files = 10
+
+# Header formats, tried in order before the built-in generic format.
+# Required named groups: level, ts, msg. Optional: logger.
+[[logs.formats]]
+name = "app"
+pattern = '^(?P<ts>\d{4}-\d{2}-\d{2}T[\d:.,]+(?:Z|[+-]\d{2}:?\d{2})?)\s+(?P<level>[A-Z]+)\s+(?P<logger>\S+)\s+-\s(?P<msg>.*)$'
+
+[prompts]
+# override_dir = "prompts"   # folder next to this file; only the packaged prompt names are accepted

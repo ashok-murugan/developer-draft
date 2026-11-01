@@ -1,0 +1,8 @@
+{
+  // TEMPLATE — copy this file to: <your-workspace>/.vscode/settings.json
+  // Enables MCP tool support in VS Code Copilot Chat.
+  // Merge with your existing settings.json if one already exists.
+  "chat.mcp.enabled": true,
+  "chat.agent.enabled": true
+}
+
