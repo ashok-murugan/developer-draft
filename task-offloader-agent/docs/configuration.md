@@ -161,8 +161,17 @@ task-offloader [global options] <command> [command options]
 |---|---|
 | `init` | Set up `.task-offloader/` in the current directory and wire AI clients |
 | `profile check` | Validate the profile and print any errors |
+| `upgrade` | Pull latest code from the git clone and reinstall |
+| `uninstall` | Remove `task-offloader-agent` from the current venv (with confirmation) |
 
 **`init` flags:** `--model <tag>`, `--client <N...>`, `--force`, `--dry-run`
+
+> [!NOTE]
+> **Windows — `upgrade`:** the running executable is locked by the OS and cannot replace itself.
+> After `task-offloader upgrade` completes the git pull, open a **new** terminal and run:
+> ```
+> pip install -e "<clone path>\task-offloader-agent"
+> ```
 
 ### MCP server
 
