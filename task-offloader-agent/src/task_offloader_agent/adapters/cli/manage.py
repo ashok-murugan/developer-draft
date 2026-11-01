@@ -49,35 +49,28 @@ def _stop_service() -> None:
     print("Stopping task-offloader service...")
 
     if system == "Windows":
-        # Use wmic to find task-offloader.exe processes whose command line contains " mcp"
-        # (the MCP server subcommand), then kill by PID — never by image name, which would
-        # also kill this upgrade/uninstall process.
+        # Use PowerShell Get-CimInstance to find task-offloader.exe processes whose
+        # command line contains " mcp" (the MCP server subcommand), then kill by PID.
+        # wmic is deprecated/removed on Windows 11; Get-CimInstance is always available.
+        # Never kill by image name — that would also kill this upgrade/uninstall process.
+        ps_cmd = (
+            f"$own = {own_pid}; "
+            "Get-CimInstance Win32_Process -Filter \"name='task-offloader.exe'\" "
+            "| Where-Object { $_.CommandLine -like '* mcp*' -and $_.ProcessId -ne $own } "
+            "| ForEach-Object { "
+            "    Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue; "
+            "    Write-Host ('stopped PID ' + $_.ProcessId) "
+            "}"
+        )
         result = subprocess.run(
-            [
-                "wmic", "process",
-                "where", "name='task-offloader.exe' and commandline like '% mcp%'",
-                "get", "processid", "/format:value",
-            ],
+            ["powershell", "-NoProfile", "-NonInteractive", "-Command", ps_cmd],
             capture_output=True, text=True,
         )
-        pids = []
-        for line in result.stdout.splitlines():
-            line = line.strip()
-            if line.startswith("ProcessId="):
-                try:
-                    pid = int(line.split("=", 1)[1].strip())
-                    if pid and pid != own_pid:
-                        pids.append(pid)
-                except ValueError:
-                    pass
-
-        if not pids:
-            print("  (no running service found)")
+        output = (result.stdout + result.stderr).strip()
+        if output:
+            print(f"  {output}")
         else:
-            for pid in pids:
-                subprocess.run(["taskkill", "/F", "/T", "/PID", str(pid)],
-                               capture_output=True)
-            print(f"  stopped {len(pids)} process(es).")
+            print("  (no running service found)")
     else:
         # POSIX: pkill by command pattern — does not match the upgrade/uninstall caller
         result = subprocess.run(
