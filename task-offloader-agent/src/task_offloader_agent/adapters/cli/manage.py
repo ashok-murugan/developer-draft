@@ -129,10 +129,23 @@ def run_upgrade() -> int:
     # On Windows the running .exe is locked by the OS, so pip cannot replace it
     # while this process is alive.  Print manual instructions instead.
     if platform.system() == "Windows":
+        venv_dir = Path(sys.executable).parent.parent   # .venv/
+        activate  = venv_dir / "Scripts" / "Activate.ps1"
+        pip_exe   = venv_dir / "Scripts" / "pip"
         print()
         print("Windows: the running executable is locked and cannot replace itself.")
         print("Open a NEW terminal and run:")
-        print(f'  pip install -e "{repo_dir}"')
+        print()
+        print(f'  cd "{repo_dir}"')
+        if activate.exists():
+            print(f'  .venv\\Scripts\\Activate.ps1    # activate the venv')
+            print(f'  pip install -e .')
+            print()
+            print("  Or without activating:")
+        print(f'  "{pip_exe}" install -e "{repo_dir}"')
+        print()
+        print("Note: use the venv pip (shown above), not the system pip,")
+        print("to make sure the installed command is updated in the right environment.")
         print()
         print("Then restart your AI client to pick up any MCP protocol changes.")
         return 0
