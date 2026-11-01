@@ -69,6 +69,35 @@ def build_server(runtime: Runtime) -> MCPServer:
         return await service.summarize_logs(runtime.target, files, since, until, pattern, correlation_id,
                                             narrate, requested_by_user, _progress(ctx))
 
+    @mcp.tool()
+    async def workspace_context() -> dict[str, Any]:
+        """Return a structured snapshot of this workspace: active/inactive tools, deny paths, log dirs,
+        model, token budget. Call once at session start so you can make correct offload decisions.
+        No Ollama call — instant."""
+        return await service.workspace_context(runtime.target)
+
+    @mcp.tool()
+    async def local_report() -> dict[str, Any]:
+        """Usage report from audit.jsonl: total calls, per-tool ok/failed/rated breakdown, estimated
+        chars and tokens saved by offloading to the local model, unrated count, bad-rate alerts.
+        No Ollama call — instant."""
+        return await service.local_report(runtime.target)
+
+    @mcp.tool()
+    async def local_rate(run_id: str, rating: str) -> dict[str, Any]:
+        """Rate a task-offloader result immediately after using it.
+        run_id: the run_id from a previous local_ask or summarize_logs response.
+        rating: 'good' (answer was useful) or 'bad' (answer was wrong or unhelpful).
+        No Ollama call — instant."""
+        return await service.local_rate(runtime.target, run_id, rating)
+
+    @mcp.tool()
+    async def local_pending_ratings() -> dict[str, Any]:
+        """Return all unrated ok/partial results with their run_id, tool, timestamp and summary.
+        Use at session start to prompt the developer to rate past results, or after a local_ask /
+        summarize_logs call to keep ratings current. No Ollama call — instant."""
+        return await service.local_pending_ratings(runtime.target)
+
     return mcp
 
 

@@ -26,13 +26,17 @@ class ToolSpec:
 TOOLS: dict[str, ToolSpec] = {
     spec.name: spec
     for spec in (
-        ToolSpec("local_status", True, True),
-        ToolSpec("local_ask", True, True),
-        ToolSpec("summarize_logs", True, True),
-        ToolSpec("draft_tests", False, False),
-        ToolSpec("draft_docs", False, False),
-        ToolSpec("draft_text", False, False),
-        ToolSpec("draft_fixture", False, False),
+        ToolSpec("local_status",          True,  True),
+        ToolSpec("local_ask",             True,  True),
+        ToolSpec("summarize_logs",        True,  True),
+        ToolSpec("workspace_context",     True,  True),
+        ToolSpec("local_report",          True,  True),
+        ToolSpec("local_rate",            True,  True),
+        ToolSpec("local_pending_ratings", True,  True),
+        ToolSpec("draft_tests",           False, False),
+        ToolSpec("draft_docs",            False, False),
+        ToolSpec("draft_text",            False, False),
+        ToolSpec("draft_fixture",         False, False),
     )
 }
 
