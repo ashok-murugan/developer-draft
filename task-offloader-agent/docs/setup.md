@@ -5,28 +5,58 @@
 | Requirement | Notes |
 |---|---|
 | Python >= 3.12 | `python --version` |
+| Git | `git --version` |
 | [Ollama](https://ollama.com) running | `ollama serve` or system service |
 | At least one model pulled | `ollama list` |
 | A workspace directory | Any project folder |
 
 ---
 
-## Step 1 — Pull a model
+## Step 1 — Clone the repo
+
+The agent is installed **once** in a central location and shared across all workspaces. Pick a location outside your projects.
+
+**Recommended locations by OS:**
+
+| OS | Suggested path |
+|---|---|
+| Windows | `%USERPROFILE%\developer-draft\task-offloader-agent` |
+| macOS | `~/developer-draft/task-offloader-agent` |
+| Linux | `~/developer-draft/task-offloader-agent` |
+
+```powershell
+# Windows (PowerShell)
+git clone https://github.com/ashok-murugan/developer-draft.git "$env:USERPROFILE\developer-draft"
+cd "$env:USERPROFILE\developer-draft\task-offloader-agent"
+```
+
+```bash
+# macOS / Linux
+git clone https://github.com/ashok-murugan/developer-draft.git ~/developer-draft
+cd ~/developer-draft/task-offloader-agent
+```
+
+> [!NOTE]
+> `developer-draft` is a multi-project repo. `task-offloader-agent/` is the subdirectory you work from.
+> Any path works — update `--workspace` / `TASK_OFFLOADER_WORKSPACE` accordingly.
+
+---
+
+## Step 2 — Pull a model
 
 ```bash
 ollama pull qwen2.5-coder:7b
 ollama list                     # confirm it appears
 ```
 
-For model comparisons and hardware requirements, see [Model Guide](models.md).
+Not sure which model to pick? See the [Model Recommendation Guide](models.md) for a comparison table, hardware requirements, and task-specific suggestions (log triage vs code Q&A).
 
 ---
 
-## Step 2 — Install the agent
+## Step 3 — Install the agent
 
 ```powershell
-# PowerShell
-cd task-offloader-agent
+# PowerShell — from the cloned directory
 python -m venv .venv
 .venv\Scripts\activate
 pip install -e .
@@ -34,8 +64,7 @@ task-offloader --version
 ```
 
 ```bash
-# bash
-cd task-offloader-agent
+# bash — from the cloned directory
 python -m venv .venv
 source .venv/bin/activate
 pip install -e .
@@ -44,7 +73,7 @@ task-offloader --version
 
 ---
 
-## Step 3 — Initialise a workspace
+## Step 4 — Initialise a workspace
 
 `cd` into your project directory, then:
 
@@ -101,7 +130,7 @@ For a second workspace, just `cd` there and run `task-offloader init` again. Eac
 
 ---
 
-## Step 4 — Validate profile
+## Step 5 — Validate profile
 
 ```bash
 task-offloader profile check

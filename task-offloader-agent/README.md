@@ -43,61 +43,61 @@ flowchart TD
 
 ## Quick start
 
-**Requirements:** Python >= 3.12, [Ollama](https://ollama.com) running, at least one model pulled.
+**Requirements:** Python >= 3.12, Git, [Ollama](https://ollama.com/download) installed.
 
-### 1 — Pull a model
+### 1 — Clone
 
-```bash
-ollama pull qwen2.5-coder:7b    # or any model from ollama list
+```powershell
+# Windows
+git clone https://github.com/ashok-murugan/developer-draft.git "%USERPROFILE%\developer-draft"
+cd "%USERPROFILE%\developer-draft\task-offloader-agent"
 ```
 
-### 2 — Install
+```bash
+# macOS / Linux
+git clone https://github.com/ashok-murugan/developer-draft.git ~/developer-draft
+cd ~/developer-draft/task-offloader-agent
+```
+
+### 2 — Pull a model
 
 ```bash
-cd task-offloader-agent
-python -m venv .venv
+ollama pull qwen2.5-coder:7b
+```
 
+→ Not sure which model? See the [Model Recommendation Guide](docs/models.md).
+
+### 3 — Install
+
+```powershell
 # Windows
-.venv\Scripts\activate
-# macOS / Linux
-source .venv/bin/activate
-
-pip install -e .
+python -m venv .venv && .venv\Scripts\activate && pip install -e .
 task-offloader --version
 ```
 
-### 3 — Initialise a workspace
+```bash
+# macOS / Linux
+python -m venv .venv && source .venv/bin/activate && pip install -e .
+task-offloader --version
+```
 
-Run from inside your project directory:
+### 4 — Initialise a workspace
 
 ```bash
 cd <your-workspace>
 task-offloader init
 ```
 
-The command:
-- creates `.task-offloader/` with `profile.toml` pre-filled with your model
-- detects which AI clients exist (VS Code, Cursor, Claude, Antigravity) and wires the MCP server
-- prints a checklist of what was created or skipped
+Detects your AI clients, writes `.task-offloader/profile.toml`, and wires the MCP server.  
+→ Full walkthrough, flags, and OS-specific paths: [Setup Guide](docs/setup.md).
 
-**Options:**
-
-```bash
-task-offloader init --model qwen2.5-coder:7b   # skip model prompt
-task-offloader init --client 1 3               # wire only Copilot + Cursor (numbered menu)
-task-offloader init --force                    # overwrite existing client configs
-task-offloader init --dry-run                  # preview without writing
-```
-
-Client numbers: `1` VS Code/Copilot · `2` Claude Desktop · `3` Cursor · `4` Antigravity · `5` All.
-
-### 4 — Validate
+### 5 — Validate
 
 ```bash
 task-offloader profile check
 ```
 
-Fix any reported errors, then restart your AI client.
+Restart your AI client. You're done.
 
 ---
 
