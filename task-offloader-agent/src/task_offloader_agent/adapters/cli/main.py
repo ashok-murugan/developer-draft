@@ -113,6 +113,15 @@ def _parser() -> argparse.ArgumentParser:
     p.add_argument("--days", type=int)
     p = sub.add_parser("apply", help="copy a draft into place (not available yet)")
     p.add_argument("run_id")
+
+    p = sub.add_parser("init", help="set up TaskOffloaderAgent in the current workspace")
+    p.add_argument("--model", help="Ollama model tag (skips model prompt)")
+    p.add_argument("--client", nargs="*", type=int, metavar="N",
+                   help="client number(s): 1=copilot 2=claude 3=cursor 4=antigravity 5=all")
+    p.add_argument("--force", action="store_true",
+                   help="overwrite existing client config files")
+    p.add_argument("--dry-run", action="store_true",
+                   help="print actions without writing")
     return parser
 
 
@@ -126,6 +135,15 @@ def main(argv: list[str] | None = None) -> int:
 
         return server.run(args.workspace, args.profile, args.mode)
 
+    if args.cmd == "init":
+        from .init import run_init  # lazy import - init does not need config
+
+        return run_init(
+            model_flag=getattr(args, "model", None),
+            client_flag=getattr(args, "client", None),
+            force=getattr(args, "force", False),
+            dry_run=getattr(args, "dry_run", False),
+        )
     try:
         config = load_config(workspace=args.workspace, profile=args.profile, mode=args.mode)
     except ConfigError as exc:
@@ -187,6 +205,8 @@ def main(argv: list[str] | None = None) -> int:
         elif args.cmd == "apply":
             print("apply is not available: drafting tools are not built.", file=sys.stderr)
             return 2
+        elif args.cmd == "init":
+            pass  # handled before config load
     except (ValueError, OSError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
