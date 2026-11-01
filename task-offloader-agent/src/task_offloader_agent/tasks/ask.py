@@ -21,6 +21,21 @@ MAX_INSTRUCTION_CHARS = 2000
 NOTHING = "NOTHING RELEVANT"
 SAFETY = 100  # tokens kept free for the retry note
 
+_TASK_KEYWORDS: list[tuple[str, list[str]]] = [
+    ("log_triage",   ["log", "error", "exception", "stack trace", "warn", "crash", "traceback"]),
+    ("doc_summary",  ["summarize", "summary", "document", "readme", "spec", "explain"]),
+    ("code_review",  ["review", "smell", "improve", "refactor", "issue", "bug", "fix"]),
+    ("code_qa",      ["what", "how", "why", "where", "which", "function", "class", "method"]),
+]
+
+
+def _infer_task_type(instruction: str) -> str:
+    low = instruction.lower()
+    for tag, keywords in _TASK_KEYWORDS:
+        if any(kw in low for kw in keywords):
+            return tag
+    return "other"
+
 
 def load_sources(env: Env, paths: list[str], text: str | None) -> list[Source]:
     sources: list[Source] = []
@@ -75,7 +90,7 @@ async def run_ask(ctx: RunContext, instruction: str, paths: list[str] | None, te
 
     files = {s.label: CitedFile(s.total_lines, s.line_chars) for s in sources}
     input_chars = sum(sum(len(x) + 1 for x in s.lines) for s in sources)
-    metrics = {"files_in": len(paths), "input_chars": input_chars}
+    metrics = {"files_in": len(paths), "input_chars": input_chars, "task_type": _infer_task_type(instruction)}
 
     system = prompts.get("ask_system").template
     chunk_prompt = prompts.get("ask_chunk")

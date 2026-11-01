@@ -6,6 +6,7 @@ import argparse
 import asyncio
 import json
 import sys
+from pathlib import Path
 
 from ... import __version__
 from ...application import lifecycle, report, service
@@ -100,7 +101,14 @@ def _parser() -> argparse.ArgumentParser:
     p = sub.add_parser("rate", help="rate a local_ask/summarize_logs result")
     p.add_argument("run_id")
     p.add_argument("rating", choices=("good", "bad"))
-    sub.add_parser("report", help="measurement report from the audit log")
+    p = sub.add_parser("report", help="measurement report from the audit log")
+    p.add_argument("--audit-file", help="path to an audit.jsonl file (cross-workspace)")
+    p.add_argument("--fail-on-bad-rate", action="store_true",
+                   help="exit 1 when more than half of rated results are bad for any tool")
+    p = sub.add_parser("summary", help="daily call breakdown for the last N days")
+    p.add_argument("--days", type=int, default=7)
+    p.add_argument("--audit-file", help="path to an audit.jsonl file (cross-workspace)")
+    sub.add_parser("rate-pending", help="interactively rate unrated ok/partial results")
     p = sub.add_parser("clean", help="delete run folders older than the retention period")
     p.add_argument("--days", type=int)
     p = sub.add_parser("apply", help="copy a draft into place (not available yet)")
