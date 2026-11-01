@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -17,30 +18,86 @@ from ...core.errors import ConfigError
 EXIT_CONFIG = 2
 
 
+# ---------------------------------------------------------------------------
+# colour helpers  (ANSI SGR; disabled by NO_COLOR env var or non-tty stdout)
+# ---------------------------------------------------------------------------
+_COLOR = sys.stdout.isatty() and os.environ.get("NO_COLOR") is None
+
+
+def _c(code: str, text: str) -> str:
+    return f"\033[{code}m{text}\033[0m" if _COLOR else text
+
+
+_DIM    = "2"
+_GREEN  = "32"
+_YELLOW = "33"
+_RED    = "31"
+_CYAN   = "36"
+
+
 def _print_tools(state: switch.SwitchState) -> None:
-    print(f"{'tool':<16} {'flag':<6} {'source':<8} effective")
-    for row in switch.tool_rows(state):
-        source = "file" if row["set_in_file"] else "default"
-        print(f"{row['tool']:<16} {str(row['flag']).lower():<6} {source:<8} {row['effective']}")
+    rows = switch.tool_rows(state)
+    # dynamic column width — never truncate long tool names
+    name_w = max(len(r["tool"]) for r in rows) + 2
+
+    header = f"{'tool':<{name_w}} {'flag':<6} {'source':<8} effective"
+    print(_c(_DIM, header))
+
+    for row in rows:
+        source    = "file" if row["set_in_file"] else "default"
+        flag_str  = str(row["flag"]).lower()
+        eff       = row["effective"]
+
+        # pad *before* colourising so ANSI bytes don't shift column widths
+        name_p   = f"{row['tool']:<{name_w}}"
+        flag_p   = f"{flag_str:<6}"
+        source_p = f"{source:<8}"
+
+        name_col = _c(_DIM, name_p)   if not row["built"] else name_p
+        flag_col = _c(_GREEN, flag_p) if row["flag"]      else _c(_DIM, flag_p)
+
+        if eff == "on":
+            eff_col = _c(_GREEN, eff)
+        elif eff == "not built":
+            eff_col = _c(_DIM, eff)
+        elif eff.startswith("off"):
+            eff_col = _c(_YELLOW, eff)
+        else:
+            eff_col = eff
+
+        print(f"{name_col}{flag_col}{source_p}{eff_col}")
 
 
 def _print_state(config: Config) -> None:
     settings = config.settings
     env = lifecycle.build_env(config)
     state = switch.read_switch(settings)
-    print(f"profile: {config.profile.name} ({settings.profile_path})")
-    print(f"mode: {state.mode}  (from {state.source}: "
-          f"{settings.switch_file if state.source == 'file' else 'TASK_OFFLOADER_MODE'})")
+
+    mode_col = (
+        _c(_GREEN,  state.mode) if state.mode == "auto"   else
+        _c(_YELLOW, state.mode) if state.mode == "manual" else
+        _c(_RED,    state.mode)
+    )
+    print(f"{_c(_DIM, 'profile:')} {config.profile.name}  {_c(_DIM, str(settings.profile_path))}")
+    src_label = settings.switch_file if state.source == "file" else "TASK_OFFLOADER_MODE"
+    print(f"{_c(_DIM, 'mode:')}    {mode_col}  {_c(_DIM, f'(from {state.source}: {src_label})')}")
+
     if state.error:
-        print(f"ERROR: {state.error} -> treated as off")
+        print(_c(_RED, f"ERROR: {state.error} -> treated as off"))
     for warning in state.warnings:
-        print(f"warning: {warning}")
+        print(_c(_YELLOW, f"warning: {warning}"))
+
     health = asyncio.run(env.provider.health())
     if not health["reachable"]:
-        print(f"ollama: NOT reachable at {settings.provider_url} ({health.get('error')})")
+        print(f"{_c(_DIM, 'ollama:')} {_c(_RED, 'NOT reachable')} at {settings.provider_url}"
+              f"  ({health.get('error')})")
     else:
-        print(f"ollama: reachable; model {health['model']}: {'present' if health['model_present'] else 'MISSING'}")
-    print(f"num_ctx {settings.num_ctx}, timeout {settings.timeout_s:.0f} s, tokenizer: {env.counter.kind}")
+        model_state = _c(_GREEN, "present") if health["model_present"] else _c(_RED, "MISSING")
+        print(f"{_c(_DIM, 'ollama:')} reachable  model {_c(_CYAN, health['model'])} {model_state}")
+
+    print(_c(_DIM, f"num_ctx {settings.num_ctx}, timeout {settings.timeout_s:.0f} s,"
+             f" tokenizer: {env.counter.kind}"))
+    print()
     _print_tools(state)
 
 
