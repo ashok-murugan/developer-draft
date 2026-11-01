@@ -131,6 +131,7 @@ python -m pytest tests/integration/           # requires Ollama + model running
 
 | Document | Description |
 |---|---|
+| [Vision & Roadmap](VISION.md) | Product vision, architecture, milestones, and success KPIs |
 | [Setup Guide](docs/setup.md) | Install, `init` command, multi-workspace |
 | [Workspace Config](docs/workspace-config.md) | `.task-offloader/` layout, `profile.toml`, `switch.json` |
 | [Configuration Reference](docs/configuration.md) | CLI flags, env vars, profile keys, result contract |
