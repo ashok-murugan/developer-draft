@@ -72,7 +72,7 @@ task-offloader --version
 > $env:PATH += ";$binPath"   # also applies to the current session immediately
 > ```
 > After this, `task-offloader` works in every new terminal without activation.
-> Alternatively, use the `.task-offloader\task-offloader.ps1` wrapper that `init` creates in each workspace — it works without any PATH change.
+> Alternatively, use the `.task-offloader\task-offloader.cmd` wrapper that `init` creates in each workspace — it works without any PATH change and without PowerShell execution policy issues.
 
 ```bash
 # bash — from the cloned directory
@@ -148,6 +148,58 @@ task-offloader profile check
 ```
 
 Fix any reported errors before starting the MCP server.
+
+The check also warns about:
+- deny paths configured in `profile.toml` that don't exist in the workspace
+- log `allowed_dirs` that overlap with `deny_paths`
+---
+
+## Upgrading
+
+```bash
+task-offloader upgrade
+```
+
+Stops the running MCP server, pulls the latest code from the git clone, then prints the reinstall command.
+
+> [!NOTE]
+> **Windows:** the running executable is locked by the OS and cannot replace itself while it runs.
+> After `upgrade` completes the git pull, open a **new** terminal and run:
+> ```powershell
+> cd "$env:USERPROFILE\developer-draft\task-offloader-agent"
+> .venv\Scripts\Activate.ps1        # activate the venv
+> pip install -e .
+> ```
+> Or without activating:
+> ```powershell
+> .venv\Scripts\pip install -e "path\to\task-offloader-agent"
+> ```
+> Use the **venv pip**, not the system pip — otherwise the installed command won't update.
+
+After reinstalling, restart your AI client to pick up any MCP protocol changes.
+
+---
+
+## Uninstalling
+
+```bash
+task-offloader uninstall
+```
+
+Prompts for confirmation, then:
+1. Stops the running MCP server
+2. Uninstalls `task-offloader-agent` from the venv
+3. Deletes the git clone directory
+
+Workspace configs (`.task-offloader/` in each project) are **not** removed. Clean them up manually if needed:
+```powershell
+# Windows
+Remove-Item -Recurse -Force .task-offloader
+```
+```bash
+# macOS / Linux
+rm -rf .task-offloader
+```
 
 ---
 
@@ -246,6 +298,17 @@ Config file locations:
 - `skills/task-offloader/SKILL.md` — invoked when the agent sees large files or log paths
 
 For MCP server registration in Antigravity's agent config, see [Integration Guide](integration.md).
+
+
+---
+
+## Restarting the MCP server
+
+```bash
+task-offloader restart
+```
+
+Stops the running MCP server. Your AI client will automatically reconnect and restart it on the next tool call. Use this after editing `profile.toml` or changing the switch state, when a full `upgrade` isn't needed.
 
 ---
 

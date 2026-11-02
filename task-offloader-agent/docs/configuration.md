@@ -6,7 +6,7 @@ Config priority (highest first):
 CLI flags  >  environment variables  >  profile.toml  >  built-in defaults
 ```
 
-An invalid value at any layer is a hard **configuration error** — the server reports `config_error` on the status tool until fixed.
+An invalid value at any layer is a hard **configuration error** Ã¢â‚¬â€ the server reports `config_error` on the status tool until fixed.
 
 ---
 
@@ -20,6 +20,9 @@ An invalid value at any layer is a hard **configuration error** — the server r
 | `--version` | Print version and exit. |
 
 > [!TIP]
+> If `.task-offloader/profile.toml` exists in the current directory, `--workspace` and `--profile` are auto-detected. You don't need to pass them when running from the workspace directory.
+
+> [!TIP]
 > `init` creates `.task-offloader/task-offloader.ps1` in the workspace. That wrapper fills in `--workspace` and `--profile` automatically so you don't need to type them for every command.
 
 ---
@@ -28,10 +31,10 @@ An invalid value at any layer is a hard **configuration error** — the server r
 
 | Variable | Equivalent | Default |
 |---|---|---|
-| `TASK_OFFLOADER_WORKSPACE` | `--workspace` | — |
-| `TASK_OFFLOADER_PROFILE` | `--profile` | — |
+| `TASK_OFFLOADER_WORKSPACE` | `--workspace` | Ã¢â‚¬â€ |
+| `TASK_OFFLOADER_PROFILE` | `--profile` | Ã¢â‚¬â€ |
 | `TASK_OFFLOADER_MODE` | `--mode` | `auto` |
-| `TASK_OFFLOADER_MODEL` | `inference.model` | — |
+| `TASK_OFFLOADER_MODEL` | `inference.model` | Ã¢â‚¬â€ |
 | `TASK_OFFLOADER_NUM_CTX` | `inference.num_ctx` | `16384` |
 | `TASK_OFFLOADER_CHUNK_TOKENS` | chunk size for `local_ask` | `min(12000, num_ctx - 2000)` |
 | `TASK_OFFLOADER_MAX_CHUNKS` | max chunks for `local_ask` | `4` |
@@ -39,12 +42,12 @@ An invalid value at any layer is a hard **configuration error** — the server r
 | `TASK_OFFLOADER_MAX_PENDING` | queued calls before `busy` | `3` |
 | `TASK_OFFLOADER_KEEP_ALIVE` | Ollama keep-alive duration | `5m` |
 | `TASK_OFFLOADER_RETENTION_DAYS` | `run/` cleanup period (days) | `14` |
-| `TASK_OFFLOADER_TOKENIZER` | path to `tokenizer.json` | — |
+| `TASK_OFFLOADER_TOKENIZER` | path to `tokenizer.json` | Ã¢â‚¬â€ |
 | `TASK_OFFLOADER_PROVIDER_URL` | Ollama base URL | `http://127.0.0.1:11434` |
 
 ---
 
-## profile.toml — full reference
+## profile.toml Ã¢â‚¬â€ full reference
 
 Annotated template: [`assets/workspace/profile.toml`](../assets/workspace/profile.toml).  
 Extended layout guide: [Workspace Config](workspace-config.md).
@@ -62,7 +65,7 @@ Extended layout guide: [Workspace Config](workspace-config.md).
 |---|---|---|
 | `provider` | string | Only `"ollama"` is supported |
 | `model` | string | Ollama model name or tag |
-| `num_ctx` | integer | Context window in tokens (4096–131072) |
+| `num_ctx` | integer | Context window in tokens (4096Ã¢â‚¬â€œ131072) |
 | `tokenizer` | string | Path to `tokenizer.json`, relative to the profile file |
 
 ### `[security]`
@@ -116,7 +119,7 @@ input_limit = num_ctx - num_predict - 1500
 | `local_ask` (merge pass) | 1024 |
 | `summarize_logs` (narrative) | 768 |
 
-`local_ask` splits input into chunks of `chunk_tokens` (default: `min(12000, num_ctx - 2000)`) with at most `max_chunks` (default: 4). If the input exceeds `max_chunks × chunk_tokens` the call is **refused** — input is never silently truncated.
+`local_ask` splits input into chunks of `chunk_tokens` (default: `min(12000, num_ctx - 2000)`) with at most `max_chunks` (default: 4). If the input exceeds `max_chunks Ãƒâ€” chunk_tokens` the call is **refused** Ã¢â‚¬â€ input is never silently truncated.
 
 The log digest is capped at 8000 tokens. Without a tokenizer file, counts are estimated at 3 characters per token (conservative).
 
@@ -143,7 +146,7 @@ Per-tool flags override the mode: a tool set to `false` is always off regardless
 { "mode": "auto",   "tools": { "summarize_logs": false } } // log triage off only
 ```
 
-Full examples: [workspace-config.md → switch.json](workspace-config.md#switchjson--onoff-state-reference)
+Full examples: [workspace-config.md Ã¢â€ â€™ switch.json](workspace-config.md#switchjson--onoff-state-reference)
 
 ---
 
@@ -162,16 +165,20 @@ task-offloader [global options] <command> [command options]
 | `init` | Set up `.task-offloader/` in the current directory and wire AI clients |
 | `profile check` | Validate the profile and print any errors |
 | `upgrade` | Pull latest code from the git clone and reinstall |
-| `uninstall` | Remove `task-offloader-agent` from the current venv (with confirmation) |
+| `restart` | Stop the running MCP server (AI client restarts it automatically) |
+| `uninstall` | Remove `task-offloader-agent` from the current venv and delete the clone directory |
 
 **`init` flags:** `--model <tag>`, `--client <N...>`, `--force`, `--dry-run`
 
 > [!NOTE]
 > **Windows — `upgrade`:** the running executable is locked by the OS and cannot replace itself.
 > After `task-offloader upgrade` completes the git pull, open a **new** terminal and run:
+> ```powershell
+> cd "$env:USERPROFILE\developer-draft\task-offloader-agent"
+> .venv\Scripts\Activate.ps1     # activate the venv
+> pip install -e .
 > ```
-> pip install -e "<clone path>\task-offloader-agent"
-> ```
+> Use the **venv pip**, not the system pip — otherwise the installed command won't update.
 
 ### MCP server
 
@@ -201,6 +208,24 @@ task-offloader [global options] <command> [command options]
 |---|---|
 | `ask <instruction> [paths...]` | Run `local_ask` directly from the terminal |
 | `logs <files...>` | Run `summarize_logs` directly from the terminal |
+
+### MCP tools (exposed to AI clients)
+
+| Tool | Default | Description |
+|---|---|---|
+| `local_status` | on | Service health, mode, per-tool state, Ollama readiness |
+| `local_ask` | on | Send a question + workspace files to the local model |
+| `summarize_logs` | on | Deterministic log digest + local model narrative |
+| `workspace_context` | on | Full workspace snapshot: tools, deny paths, log dirs, token budget â€” call once at session start |
+| `local_report` | on | Usage stats from audit log as JSON: call counts, savings, ratings, alerts |
+| `local_rate` | on | Rate a result `good` or `bad` immediately after using it |
+| `local_pending_ratings` | on | List unrated results so the AI client can prompt the developer |
+| `draft_tests` | off | *(not built)* |
+| `draft_docs` | off | *(not built)* |
+| `draft_text` | off | *(not built)* |
+| `draft_fixture` | off | *(not built)* |
+
+All built tools are on by default. Turn any off with `task-offloader off <tool>`.
 
 **`ask` flags:** `--text <string>`, `--max-words <N>`  
 **`logs` flags:** `--since`, `--until`, `--pattern`, `--correlation-id`, `--no-narrate`

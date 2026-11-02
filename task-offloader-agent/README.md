@@ -79,7 +79,9 @@ task-offloader --version
 
 ```bash
 # macOS / Linux
-python -m venv .venv && source .venv/bin/activate && pip install -e .
+python -m venv .venv
+source .venv/bin/activate
+pip install -e .
 task-offloader --version
 ```
 
@@ -109,10 +111,11 @@ Restart your AI client. You're done.
 task-offloader on      # resume (uses .task-offloader/ defaults)
 task-offloader off     # pause
 task-offloader status  # state, provider health, token counter
+task-offloader restart # stop MCP server (AI client restarts it automatically)
 ```
 
 > [!NOTE]
-> Without `--workspace` and `--profile` flags, the CLI reads `TASK_OFFLOADER_WORKSPACE` and `TASK_OFFLOADER_PROFILE` env vars, or uses the `.task-offloader/task-offloader.ps1` wrapper created by `init`.
+> Without `--workspace` and `--profile` flags, the CLI auto-detects the workspace from the current directory (if `.task-offloader/profile.toml` exists there), reads `TASK_OFFLOADER_WORKSPACE` / `TASK_OFFLOADER_PROFILE` env vars, or uses the `.task-offloader/task-offloader.cmd` wrapper that `init` creates.
 
 See [Configuration → Operating modes](docs/configuration.md#operating-modes) for per-tool control.
 
